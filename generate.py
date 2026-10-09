@@ -13,13 +13,20 @@ def main():
 
     channels = data.get("items", []) if isinstance(data, dict) else data
 
+    # EXTM3U with standard attributes
     m3u_lines = ["#EXTM3U\n"]
     for item in channels:
-        name = item.get("name", "Unknown")
+        ch_id = item.get("id", "")
+        name = item.get("name", "Unknown").strip()
         logo = item.get("logo_url", "")
-        url = item.get("stream_url", "")
+        url = item.get("stream_url", "").strip()
+        category = item.get("category", "Live TV")
+
         if url:
-            m3u_lines.append(f'#EXTINF:-1 tvg-logo="{logo}",{name}\n{url}\n')
+            # Full IPTV specification line: tvg-id, tvg-name, tvg-logo, group-title
+            m3u_lines.append(
+                f'#EXTINF:-1 tvg-id="{ch_id}" tvg-name="{name}" tvg-logo="{logo}" group-title="{category}",{name}\n{url}\n'
+            )
 
     with open("playlist.m3u", "w", encoding="utf-8") as f:
         f.writelines(m3u_lines)
